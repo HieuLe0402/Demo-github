@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Sổ tay tra cứu các câu lệnh Git thông dụng từ cơ bản đến nâng cao dành cho lập trình viên. Hướng dẫn trực quan, ví dụ cụ thể, hỗ trợ sao chép nhanh.">
+  <title>Git Commands Cheatsheet - Sổ Tay Lệnh Git Toàn Diện</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-primary: #0a0e17;
+      --bg-secondary: #111827;
+      --bg-card: rgba(17, 24, 39, 0.75);
+      --bg-card-hover: rgba(31, 41, 55, 0.85);
+      --border-color: rgba(255, 255, 255, 0.08);
+      --border-glow: rgba(99, 102, 241, 0.3);
+      
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --text-sub: #6b7280;
+      
+      --accent-primary: #6366f1;
+      --accent-primary-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
+      --accent-cyan: #06b6d4;
+      --accent-emerald: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-rose: #f43f5e;
+      
+      --code-bg: #0d1117;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 18px;
+      --radius-full: 9999px;
+      
+      --shadow-soft: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+      --shadow-glow: 0 0 25px -5px rgba(99, 102, 241, 0.25);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-main);
+      line-height: 1.6;
+      min-height: 100vh;
+      background-image: 
+        radial-gradient(circle at 15% 10%, rgba(99, 102, 241, 0.12) 0%, transparent 40%),
+        radial-gradient(circle at 85% 30%, rgba(236, 72, 153, 0.08) 0%, transparent 45%),
+        radial-gradient(circle at 50% 80%, rgba(6, 182, 212, 0.08) 0%, transparent 50%);
+      background-attachment: fixed;
+    }
+
+    /* Header & Hero */
+    header {
+      padding: 3rem 1.5rem 2rem;
+      text-align: center;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.35rem 1rem;
+      background: rgba(99, 102, 241, 0.12);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      border-radius: var(--radius-full);
+      color: #c7d2fe;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 1.25rem;
+      backdrop-filter: blur(10px);
+    }
+
+    .badge-pill svg {
+      width: 16px;
+      height: 16px;
+      fill: #818cf8;
+    }
+
+    h1 {
+      font-size: clamp(2.2rem, 5vw, 3.5rem);
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 1rem;
+      letter-spacing: -0.02em;
+    }
+
+    .gradient-text {
+      background: var(--accent-primary-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: inline-block;
+    }
+
+    .hero-desc {
+      color: var(--text-muted);
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      max-width: 650px;
+      margin: 0 auto 2rem;
+    }
+
+    /* Workflow Visualizer Banner */
+    .git-flow-card {
+      max-width: 1000px;
+      margin: 0 auto 2.5rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      backdrop-filter: blur(12px);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .git-flow-title {
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent-cyan);
+      font-weight: 700;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .git-pipeline {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      position: relative;
+    }
+
+    .pipe-step {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: var(--radius-md);
+      padding: 1rem;
+      text-align: center;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+
+    .pipe-step:hover {
+      border-color: var(--accent-primary);
+      transform: translateY(-2px);
+    }
+
+    .pipe-step .step-number {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--accent-primary);
+      text-transform: uppercase;
+      margin-bottom: 0.3rem;
+    }
+
+    .pipe-step .step-name {
+      font-weight: 700;
+      font-size: 1.05rem;
+      color: #fff;
+    }
+
+    .pipe-step .step-cmd {
+      margin-top: 0.5rem;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.8rem;
+      color: var(--accent-emerald);
+      background: rgba(16, 185, 129, 0.1);
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      display: inline-block;
+    }
+
+    /* Controls: Search & Categories */
+    .controls-container {
+      max-width: 1100px;
+      margin: 0 auto 2.5rem;
+      padding: 0 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .search-box-wrapper {
+      position: relative;
+      width: 100%;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 1rem 1.25rem 1rem 3.2rem;
+      background: rgba(17, 24, 39, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: var(--radius-md);
+      color: #fff;
+      font-size: 1.05rem;
+      outline: none;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .search-input:focus {
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25), 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 1.15rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .search-hint {
+      position: absolute;
+      right: 1.2rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.75rem;
+      color: var(--text-sub);
+      background: rgba(255, 255, 255, 0.08);
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      pointer-events: none;
+    }
+
+    /* Category Filter Pills */
+    .filter-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      justify-content: center;
+    }
+
+    .filter-pill {
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-muted);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 0.55rem 1.15rem;
+      border-radius: var(--radius-full);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .filter-pill:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+      transform: translateY(-1px);
+    }
+
+    .filter-pill.active {
+      background: var(--accent-primary);
+      color: #fff;
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+    }
+
+    /* Content Layout */
+    main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1.5rem 4rem;
+    }
+
+    .stats-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      font-size: 0.9rem;
+      color: var(--text-sub);
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 0.75rem;
+    }
+
+    .commands-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 1.5rem;
+    }
+
+    /* Command Card */
+    .cmd-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1.4rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      backdrop-filter: blur(10px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cmd-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--accent-primary-gradient);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .cmd-card:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--border-glow);
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-glow);
+    }
+
+    .cmd-card:hover::before {
+      opacity: 1;
+    }
+
+    .cmd-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 0.75rem;
+    }
+
+    .cmd-category-tag {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 0.2rem 0.6rem;
+      border-radius: var(--radius-full);
+      letter-spacing: 0.05em;
+    }
+
+    .tag-setup { background: rgba(99, 102, 241, 0.15); color: #a5b4fc; }
+    .tag-basic { background: rgba(16, 185, 129, 0.15); color: #6ee7b7; }
+    .tag-branch { background: rgba(245, 158, 11, 0.15); color: #fcd34d; }
+    .tag-remote { background: rgba(6, 182, 212, 0.15); color: #67e8f9; }
+    .tag-undo { background: rgba(244, 63, 94, 0.15); color: #fda4af; }
+    .tag-inspect { background: rgba(168, 85, 247, 0.15); color: #d8b4fe; }
+
+    .cmd-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.5rem;
+    }
+
+    .cmd-description {
+      font-size: 0.92rem;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+      flex-grow: 1;
+    }
+
+    /* Code Block inside Card */
+    .code-box {
+      background: var(--code-bg);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: var(--radius-sm);
+      padding: 0.75rem 1rem;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.75rem;
+    }
+
+    .code-box code {
+      font-family: 'Fira Code', monospace;
+      font-size: 0.9rem;
+      color: #38bdf8;
+      word-break: break-all;
+      padding-right: 2rem;
+    }
+
+    .copy-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 0.4rem;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+
+    .copy-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+
+    .copy-btn.copied {
+      color: var(--accent-emerald);
+    }
+
+    /* Explanation / Tip */
+    .cmd-tip {
+      font-size: 0.8rem;
+      color: var(--text-sub);
+      display: flex;
+      align-items: flex-start;
+      gap: 0.4rem;
+      line-height: 1.4;
+      background: rgba(255, 255, 255, 0.02);
+      padding: 0.5rem 0.75rem;
+      border-radius: 6px;
+    }
+
+    .cmd-tip strong {
+      color: var(--text-muted);
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: #1e293b;
+      border: 1px solid var(--accent-emerald);
+      color: #fff;
+      padding: 0.8rem 1.4rem;
+      border-radius: var(--radius-md);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 999;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    /* Quick Guide / Cheat Accordion */
+    .recipes-section {
+      margin-top: 4rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+    }
+
+    .recipes-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: #fff;
+    }
+
+    .recipe-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .recipe-item {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: var(--radius-md);
+      padding: 1.25rem;
+    }
+
+    .recipe-item h3 {
+      font-size: 1.05rem;
+      color: var(--accent-cyan);
+      margin-bottom: 0.6rem;
+    }
+
+    .recipe-steps {
+      list-style-type: decimal;
+      padding-left: 1.2rem;
+      color: var(--text-muted);
+      font-size: 0.88rem;
+    }
+
+    .recipe-steps li {
+      margin-bottom: 0.4rem;
+    }
+
+    .recipe-steps code {
+      font-family: 'Fira Code', monospace;
+      color: #f3f4f6;
+      background: rgba(255, 255, 255, 0.08);
+      padding: 0.1rem 0.3rem;
+      border-radius: 4px;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 3rem 1.5rem;
+      border-top: 1px solid var(--border-color);
+      color: var(--text-sub);
+      font-size: 0.9rem;
+    }
+
+    footer a {
+      color: var(--accent-primary);
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    .no-results {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 4rem 1rem;
+      color: var(--text-muted);
+    }
+
+    .no-results svg {
+      width: 48px;
+      height: 48px;
+      stroke: var(--text-sub);
+      margin-bottom: 1rem;
+    }
+
+    @media (max-width: 768px) {
+      .commands-grid {
+        grid-template-columns: 1fr;
+      }
+      .recipe-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="badge-pill">
+      <svg viewBox="0 0 24 24"><path d="M2.6 10.59L8.38 4.8a2.53 2.53 0 0 1 3.58 0l1.8 1.8-2.6 2.6c-.66-.23-1.45-.1-2 .45a2.5 2.5 0 0 0-.58 2.66L6.5 14.4a2.5 2.5 0 1 0 1.41 1.41l2.09-2.09c.81.33 1.76.2 2.37-.41a2.52 2.52 0 0 0 .5-2.73l2.5-2.5 5.92 5.92a2.53 2.53 0 0 1 0 3.58l-5.78 5.79a2.53 2.53 0 0 1-3.58 0L2.6 14.17a2.53 2.53 0 0 1 0-3.58z"/></svg>
+      Tài liệu Git Toàn Diện 2026
+    </div>
+    <h1>Sổ Tay Lệnh <span class="gradient-text">Git Tiếng Việt</span></h1>
+    <p class="hero-desc">Tra cứu nhanh toàn bộ câu lệnh Git từ cơ bản đến nâng cao, kèm giải thích chi tiết, cú pháp chính xác và quy trình làm việc chuẩn cho lập trình viên.</p>
+
+    <!-- Git Lifecycle Visualizer -->
+    <div class="git-flow-card">
+      <div class="git-flow-title">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        Quy trình dữ liệu Git chuẩn
+      </div>
+      <div class="git-pipeline">
+        <div class="pipe-step">
+          <div class="step-number">Vùng 1</div>
+          <div class="step-name">Working Dir</div>
+          <div class="step-cmd">git add .</div>
+        </div>
+        <div class="pipe-step">
+          <div class="step-number">Vùng 2</div>
+          <div class="step-name">Staging Area</div>
+          <div class="step-cmd">git commit -m</div>
+        </div>
+        <div class="pipe-step">
+          <div class="step-number">Vùng 3</div>
+          <div class="step-name">Local Repo</div>
+          <div class="step-cmd">git push</div>
+        </div>
+        <div class="pipe-step">
+          <div class="step-number">Vùng 4</div>
+          <div class="step-name">Remote Repo</div>
+          <div class="step-cmd">git pull / fetch</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Controls -->
+  <section class="controls-container">
+    <div class="search-box-wrapper">
+      <svg class="search-icon" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+      </svg>
+      <input type="text" id="searchInput" class="search-input" placeholder="Tìm kiếm câu lệnh (ví dụ: commit, branch, merge, reset, stash)..." autocomplete="off">
+      <span class="search-hint">Nhấn / để tìm</span>
+    </div>
+
+    <!-- Category Pills -->
+    <div class="filter-pills" id="categoryFilters">
+      <button class="filter-pill active" data-category="all">Tất cả (<span id="totalCount">0</span>)</button>
+      <button class="filter-pill" data-category="setup">Cài đặt & Cấu hình</button>
+      <button class="filter-pill" data-category="basic">Làm việc cơ bản</button>
+      <button class="filter-pill" data-category="branch">Nhánh (Branch)</button>
+      <button class="filter-pill" data-category="remote">Từ xa (Remote)</button>
+      <button class="filter-pill" data-category="undo">Hoàn tác & Khôi phục</button>
+      <button class="filter-pill" data-category="inspect">Kiểm tra & Log</button>
+    </div>
+  </section>
+
+  <!-- Main Content -->
+  <main>
+    <div class="stats-bar">
+      <span>Hiển thị: <strong id="displayedCount" style="color: #fff;">0</strong> lệnh</span>
+      <span>Mẹo: Click vào nút copy để sao chép lệnh ngay lập tức</span>
+    </div>
+
+    <div class="commands-grid" id="commandsGrid">
+      <!-- Generated by JavaScript -->
+    </div>
+
+    <!-- Workflows & Common Scenarios -->
+    <section class="recipes-section">
+      <div class="recipes-title">
+        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        Các tình huống làm việc thường gặp
+      </div>
+      <div class="recipe-grid">
+        <div class="recipe-item">
+          <h3>1. Đẩy dự án mới lên GitHub</h3>
+          <ol class="recipe-steps">
+            <li>Khởi tạo kho: <code>git init</code></li>
+            <li>Thêm file: <code>git add .</code></li>
+            <li>Lưu commit: <code>git commit -m "Initial commit"</code></li>
+            <li>Liên kết repo: <code>git remote add origin &lt;URL&gt;</code></li>
+            <li>Đổi tên nhánh chính: <code>git branch -M main</code></li>
+            <li>Đẩy lên GitHub: <code>git push -u origin main</code></li>
+          </ol>
+        </div>
+
+        <div class="recipe-item">
+          <h3>2. Huỷ bỏ thay đổi chưa commit</h3>
+          <ol class="recipe-steps">
+            <li>Hủy thay đổi 1 file: <code>git restore &lt;file&gt;</code></li>
+            <li>Bỏ file khỏi Staging: <code>git restore --staged &lt;file&gt;</code></li>
+            <li>Hủy toàn bộ thay đổi chưa commit: <code>git reset --hard HEAD</code></li>
+          </ol>
+        </div>
+
+        <div class="recipe-item">
+          <h3>3. Tạm cất code đang làm dở (Stash)</h3>
+          <ol class="recipe-steps">
+            <li>Lưu tạm thay đổi: <code>git stash</code></li>
+            <li>Chuyển nhánh khác fix bug: <code>git checkout &lt;branch&gt;</code></li>
+            <li>Quay lại nhánh cũ: <code>git checkout -</code></li>
+            <li>Lấy lại code đã cất: <code>git stash pop</code></li>
+          </ol>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <p>Tài liệu Git Tiếng Việt &copy; 2026. Được xây dựng để hỗ trợ cộng đồng lập trình viên học tập và làm việc hiệu quả.</p>
+  </footer>
+
+  <!-- Toast -->
+  <div id="toast" class="toast">
+    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+    <span>Đã sao chép lệnh vào bộ nhớ tạm!</span>
+  </div>
+
+  <script>
+    // Git Commands Database
+    const gitCommands = [
+      // SETUP
+      {
+        id: "git-init",
+        cmd: "git init",
+        category: "setup",
+        categoryName: "Cài đặt & Cấu hình",
+        tagClass: "tag-setup",
+        title: "Khởi tạo Git Repository",
+        desc: "Tạo một kho lưu trữ Git cục bộ mới ngay tại thư mục hiện tại. Thao tác này tạo ra thư mục ẩn .git.",
+        tip: "Chỉ cần chạy một lần duy nhất khi bắt đầu một dự án mới trên máy tính."
+      },
+      {
+        id: "git-clone",
+        cmd: "git clone <url_repo>",
+        category: "setup",
+        categoryName: "Cài đặt & Cấu hình",
+        tagClass: "tag-setup",
+        title: "Sao chép Repository từ xa",
+        desc: "Tải toàn bộ mã nguồn, các nhánh và lịch sử commit của một repository từ GitHub/GitLab về máy tính.",
+        tip: "Ví dụ: git clone https://github.com/user/project.git"
+      },
+      {
+        id: "git-config-user",
+        cmd: "git config --global user.name \"Tên Của Bạn\"",
+        category: "setup",
+        categoryName: "Cài đặt & Cấu hình",
+        tagClass: "tag-setup",
+        title: "Cấu hình Tên tác giả",
+        desc: "Thiết lập tên hiển thị của bạn cho tất cả các commit trên hệ thống máy tính này.",
+        tip: "Tên này sẽ hiển thị bên cạnh các commit mà bạn thực hiện."
+      },
+      {
+        id: "git-config-email",
+        cmd: "git config --global user.email \"email@example.com\"",
+        category: "setup",
+        categoryName: "Cài đặt & Cấu hình",
+        tagClass: "tag-setup",
+        title: "Cấu hình Email tác giả",
+        desc: "Thiết lập email liên kết với tài khoản GitHub để ghi nhận các đóng góp (contributions).",
+        tip: "Nên sử dụng đúng email bạn đã đăng ký với tài khoản GitHub."
+      },
+      {
+        id: "git-config-list",
+        cmd: "git config --list",
+        category: "setup",
+        categoryName: "Cài đặt & Cấu hình",
+        tagClass: "tag-setup",
+        title: "Xem tất cả thiết lập Git",
+        desc: "Liệt kê toàn bộ các thiết lập cấu hình hiện tại (bao gồm name, email, editor, alias).",
+        tip: "Dùng để kiểm tra lại thông tin cài đặt máy đã chuẩn xác chưa."
+      },
+
+      // BASIC
+      {
+        id: "git-status",
+        cmd: "git status",
+        category: "basic",
+        categoryName: "Làm việc cơ bản",
+        tagClass: "tag-basic",
+        title: "Kiểm tra trạng thái dự án",
+        desc: "Xem các tệp đã thay đổi, tệp đã được đưa vào Staging Area, và tệp chưa được theo dõi (untracked).",
+        tip: "Là câu lệnh quan trọng nhất được sử dụng thường xuyên nhất trong quá trình code."
+      },
+      {
+        id: "git-add-all",
+        cmd: "git add .",
+        category: "basic",
+        categoryName: "Làm việc cơ bản",
+        tagClass: "tag-basic",
+        title: "Thêm tất cả thay đổi vào Staging",
+        desc: "Đưa toàn bộ tệp mới tạo hoặc đã chỉnh sửa vào khu vực chuẩn bị (Staging Area) trước khi commit.",
+        tip: "Có thể thay dấu chấm bằng tên tệp cụ thể như: git add index.html"
+      },
+      {
+        id: "git-commit-m",
+        cmd: "git commit -m \"Nội dung mô tả commit\"",
+        category: "basic",
+        categoryName: "Làm việc cơ bản",
+        tagClass: "tag-basic",
+        title: "Lưu thay đổi (Commit)",
+        desc: "Tạo một điểm lưu trữ lịch sử mới với một thông điệp tóm tắt những gì vừa thay đổi.",
+        tip: "Viết thông điệp ngắn gọn, súc tích (Ví dụ: 'feat: add login screen')."
+      },
+      {
+        id: "git-commit-amend",
+        cmd: "git commit --amend -m \"Sửa lại thông điệp\"",
+        category: "basic",
+        categoryName: "Làm việc cơ bản",
+        tagClass: "tag-basic",
+        title: "Sửa đổi Commit gần nhất",
+        desc: "Gộp các file mới thêm vào commit trước đó hoặc thay đổi lại câu thông điệp của commit gần nhất.",
+        tip: "Chỉ nên dùng khi commit gần nhất chưa được push lên remote repo."
+      },
+      {
+        id: "git-diff",
+        cmd: "git diff",
+        category: "basic",
+        categoryName: "Làm việc cơ bản",
+        tagClass: "tag-basic",
+        title: "So sánh thay đổi",
+        desc: "Xem chi tiết từng dòng code đã sửa đổi giữa Working Directory và bản commit trước đó.",
+        tip: "Dùng 'git diff --staged' để so sánh các file đã được add vào staging area."
+      },
+
+      // BRANCH
+      {
+        id: "git-branch",
+        cmd: "git branch",
+        category: "branch",
+        categoryName: "Nhánh (Branch)",
+        tagClass: "tag-branch",
+        title: "Liệt kê danh sách nhánh",
+        desc: "Hiển thị danh sách tất cả các nhánh trong kho lưu trữ nội bộ. Nhánh có dấu * là nhánh đang đứng.",
+        tip: "Thêm cờ -a (git branch -a) để xem cả các nhánh trên máy chủ remote."
+      },
+      {
+        id: "git-branch-create",
+        cmd: "git branch <ten_nhanh_moi>",
+        category: "branch",
+        categoryName: "Nhánh (Branch)",
+        tagClass: "tag-branch",
+        title: "Tạo nhánh mới",
+        desc: "Tạo ra một nhánh độc lập mới từ vị trí commit hiện tại để phát triển tính năng riêng biệt.",
+        tip: "Lệnh này chỉ tạo nhánh, bạn vẫn đang ở nhánh cũ và cần checkout để chuyển sang."
+      },
+      {
+        id: "git-checkout-b",
+        cmd: "git checkout -b <ten_nhanh_moi>",
+        category: "branch",
+        categoryName: "Nhánh (Branch)",
+        tagClass: "tag-branch",
+        title: "Tạo và chuyển nhánh ngay",
+        desc: "Kết hợp cả 2 bước: tạo nhánh mới và chuyển ngay con trỏ sang làm việc trên nhánh đó.",
+        tip: "Phiên bản Git mới hơn hỗ trợ lệnh tương đương: git switch -c <ten_nhanh>"
+      },
+      {
+        id: "git-switch",
+        cmd: "git switch <ten_nhanh>",
+        category: "branch",
+        categoryName: "Nhánh (Branch)",
+        tagClass: "tag-branch",
+        title: "Chuyển sang nhánh khác",
+        desc: "Chuyển môi trường làm việc sang một nhánh đã tồn tại sẵn trong repository.",
+        tip: "Câu lệnh hiện đại thay thế cho 'git checkout <ten_nhanh>' nhằm phân biệt rõ mục đích."
+      },
+      {
+        id: "git-merge",
+        cmd: "git merge <ten_nhanh_can_gop>",
+        category: "branch",
+        categoryName: "Nhánh (Branch)",
+        tagClass: "tag-branch",
+        title: "Gộp nhánh (Merge)",
+        desc: "Hợp nhất lịch sử commit và nội dung của nhánh được chỉ định vào nhánh bạn đang đứng hiện tại.",
+        tip: "Hãy đứng ở nhánh đích (ví dụ: main) trước khi thực hiện merge từ nhánh tính năng."
+      },
+      {
+        id: "git-branch-delete",
+        cmd: "git branch -d <ten_nhanh>",
+        category: "branch",
+        categoryName: "Nhánh (Branch)",
+        tagClass: "tag-branch",
+        title: "Xóa nhánh cục bộ",
+        desc: "Xóa một nhánh đã gộp xong để giữ cho kho lưu trữ gọn gàng, sạch sẽ.",
+        tip: "Dùng -D viết hoa (git branch -D) nếu muốn ép buộc xóa nhánh chưa được gộp."
+      },
+
+      // REMOTE
+      {
+        id: "git-remote-v",
+        cmd: "git remote -v",
+        category: "remote",
+        categoryName: "Từ xa (Remote)",
+        tagClass: "tag-remote",
+        title: "Kiểm tra Remote URL",
+        desc: "Xem danh sách các máy chủ từ xa (remote repository) đang được liên kết với dự án.",
+        tip: "Thường hiển thị 2 địa chỉ cho 'origin': một để fetch (lấy về) và một để push (đẩy lên)."
+      },
+      {
+        id: "git-remote-add",
+        cmd: "git remote add origin <url_repo>",
+        category: "remote",
+        categoryName: "Từ xa (Remote)",
+        tagClass: "tag-remote",
+        title: "Liên kết với GitHub Repo",
+        desc: "Đặt tên viết tắt (thường là 'origin') cho một địa chỉ repository trên GitHub/GitLab.",
+        tip: "Cần thiết khi bạn khởi tạo dự án ở máy cục bộ và muốn kết nối lên repo rỗng trên GitHub."
+      },
+      {
+        id: "git-push",
+        cmd: "git push -u origin <ten_nhanh>",
+        category: "remote",
+        categoryName: "Từ xa (Remote)",
+        tagClass: "tag-remote",
+        title: "Đẩy code lên máy chủ",
+        desc: "Đẩy toàn bộ các commit mới từ nhánh local lên máy chủ GitHub/GitLab.",
+        tip: "Cờ -u (upstream) chỉ cần dùng lần đầu để liên kết nhánh. Các lần sau chỉ cần gõ 'git push'."
+      },
+      {
+        id: "git-pull",
+        cmd: "git pull origin <ten_nhanh>",
+        category: "remote",
+        categoryName: "Từ xa (Remote)",
+        tagClass: "tag-remote",
+        title: "Kéo cập nhật mới về máy",
+        desc: "Tải các commit mới từ máy chủ về và tự động gộp (merge) ngay vào nhánh hiện tại.",
+        tip: "Nên chạy 'git pull' trước khi bắt đầu phiên làm việc để tránh xung đột code với đồng đội."
+      },
+      {
+        id: "git-fetch",
+        cmd: "git fetch origin",
+        category: "remote",
+        categoryName: "Từ xa (Remote)",
+        tagClass: "tag-remote",
+        title: "Tải cập nhật (Không gộp)",
+        desc: "Chỉ tải thông tin về các commit và nhánh mới từ máy chủ về máy, không làm thay đổi code hiện tại.",
+        tip: "An toàn hơn git pull khi bạn muốn xem trước các thay đổi trước khi quyết định merge."
+      },
+
+      // UNDO & RECOVERY
+      {
+        id: "git-restore",
+        cmd: "git restore <ten_file>",
+        category: "undo",
+        categoryName: "Hoàn tác & Khôi phục",
+        tagClass: "tag-undo",
+        title: "Hủy thay đổi chưa staged",
+        desc: "Khôi phục một file trở về trạng thái của commit gần nhất, hủy bỏ tất cả chỉnh sửa chưa lưu.",
+        tip: "Thao tác này sẽ làm mất vĩnh viễn những đoạn code bạn vừa sửa trong file đó."
+      },
+      {
+        id: "git-restore-staged",
+        cmd: "git restore --staged <ten_file>",
+        category: "undo",
+        categoryName: "Hoàn tác & Khôi phục",
+        tagClass: "tag-undo",
+        title: "Bỏ file khỏi Staging Area",
+        desc: "Đưa file đã lỡ 'git add' quay trở lại trạng thái modified trong Working Directory.",
+        tip: "Nội dung code đã chỉnh sửa vẫn được giữ nguyên vẹn, không bị mất."
+      },
+      {
+        id: "git-reset-soft",
+        cmd: "git reset --soft HEAD~1",
+        category: "undo",
+        categoryName: "Hoàn tác & Khôi phục",
+        tagClass: "tag-undo",
+        title: "Hủy commit nhưng giữ code",
+        desc: "Hủy bỏ commit gần nhất, nhưng giữ nguyên toàn bộ các thay đổi trong Staging Area.",
+        tip: "Rất hữu ích khi bạn muốn gộp commit hoặc viết lại commit message cho chuẩn hơn."
+      },
+      {
+        id: "git-reset-hard",
+        cmd: "git reset --hard HEAD~1",
+        category: "undo",
+        categoryName: "Hoàn tác & Khôi phục",
+        tagClass: "tag-undo",
+        title: "Hủy bỏ commit và xóa code",
+        desc: "Hủy bỏ commit gần nhất và xóa sạch mọi thay đổi trong mã nguồn, quay lại trạng thái trước đó.",
+        tip: "Cực kỳ nguy hiểm! Chỉ sử dụng khi bạn chắc chắn muốn vứt bỏ toàn bộ những thay đổi đó."
+      },
+      {
+        id: "git-revert",
+        cmd: "git revert <commit_hash>",
+        category: "undo",
+        categoryName: "Hoàn tác & Khôi phục",
+        tagClass: "tag-undo",
+        title: "Đảo ngược commit một cách an toàn",
+        desc: "Tạo ra một commit mới có nội dung đảo ngược hoàn toàn những gì commit chỉ định đã làm.",
+        tip: "Cách an toàn nhất để hoàn tác khi code đã được push lên nhánh chung (main/master)."
+      },
+      {
+        id: "git-stash",
+        cmd: "git stash",
+        category: "undo",
+        categoryName: "Hoàn tác & Khôi phục",
+        tagClass: "tag-undo",
+        title: "Cất tạm thời code đang dở",
+        desc: "Lưu tạm thời tất cả các thay đổi chưa commit vào ngăn xếp (stash) để có working tree sạch sẽ.",
+        tip: "Rất tiện khi bạn đang làm dở tính năng nhưng phải chuyển nhánh khẩn cấp để sửa bug."
+      },
+      {
+        id: "git-stash-pop",
+        cmd: "git stash pop",
+        category: "undo",
+        categoryName: "Hoàn tác & Khôi phục",
+        tagClass: "tag-undo",
+        title: "Lấy lại code đã cất tạm",
+        desc: "Lấy lại những thay đổi đã cất trong stash gần nhất và áp dụng lại vào thư mục làm việc.",
+        tip: "Dùng 'git stash list' để xem danh sách tất cả các lần stash đã lưu."
+      },
+
+      // INSPECT & LOG
+      {
+        id: "git-log",
+        cmd: "git log --oneline --graph --decorate",
+        category: "inspect",
+        categoryName: "Kiểm tra & Log",
+        tagClass: "tag-inspect",
+        title: "Xem cây lịch sử Commit trực quan",
+        desc: "Hiển thị lịch sử commit dưới dạng cây phân nhánh rút gọn, mỗi commit trên 1 dòng kèm mã băm ngắn.",
+        tip: "Nhấn phím 'q' trên bàn phím để thoát khỏi màn hình xem log."
+      },
+      {
+        id: "git-show",
+        cmd: "git show <commit_hash>",
+        category: "inspect",
+        categoryName: "Kiểm tra & Log",
+        tagClass: "tag-inspect",
+        title: "Xem chi tiết một Commit",
+        desc: "Hiển thị thông tin tác giả, thời gian và toàn bộ thay đổi (diff) cụ thể trong commit đó.",
+        tip: "Nếu không truyền hash, Git sẽ hiển thị thông tin của commit gần nhất (HEAD)."
+      },
+      {
+        id: "git-blame",
+        cmd: "git blame <ten_file>",
+        category: "inspect",
+        categoryName: "Kiểm tra & Log",
+        tagClass: "tag-inspect",
+        title: "Xem lịch sử từng dòng code",
+        desc: "Hiển thị ai là người đã viết hoặc sửa đổi từng dòng code cụ thể trong tệp tin, cùng thời gian commit.",
+        tip: "Công cụ tuyệt vời để tìm hiểu nguyên nhân và người chịu trách nhiệm cho một đoạn logic."
+      }
+    ];
+
+    // DOM Elements
+    const commandsGrid = document.getElementById('commandsGrid');
+    const searchInput = document.getElementById('searchInput');
+    const filterPills = document.querySelectorAll('.filter-pill');
+    const totalCountEl = document.getElementById('totalCount');
+    const displayedCountEl = document.getElementById('displayedCount');
+    const toast = document.getElementById('toast');
+
+    let currentCategory = 'all';
+    let searchQuery = '';
+
+    // Update Counts
+    totalCountEl.textContent = gitCommands.length;
+
+    // Render Function
+    function renderCommands() {
+      const filtered = gitCommands.filter(item => {
+        const matchesCategory = currentCategory === 'all' || item.category === currentCategory;
+        const q = searchQuery.toLowerCase();
+        const matchesSearch = !q || 
+          item.cmd.toLowerCase().includes(q) ||
+          item.title.toLowerCase().includes(q) ||
+          item.desc.toLowerCase().includes(q) ||
+          item.categoryName.toLowerCase().includes(q);
+
+        return matchesCategory && matchesSearch;
+      });
+
+      displayedCountEl.textContent = filtered.length;
+
+      if (filtered.length === 0) {
+        commandsGrid.innerHTML = `
+          <div class="no-results">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <h3>Không tìm thấy câu lệnh phù hợp</h3>
+            <p>Hãy thử tìm bằng từ khoá khác như: add, commit, checkout, remote...</p>
+          </div>
+        `;
+        return;
+      }
+
+      commandsGrid.innerHTML = filtered.map(item => `
+        <article class="cmd-card" id="${item.id}">
+          <div>
+            <div class="cmd-header">
+              <span class="cmd-category-tag ${item.tagClass}">${item.categoryName}</span>
+            </div>
+            <h2 class="cmd-title">${item.title}</h2>
+            <p class="cmd-description">${item.desc}</p>
+          </div>
+
+          <div>
+            <div class="code-box">
+              <code>${escapeHtml(item.cmd)}</code>
+              <button class="copy-btn" title="Sao chép câu lệnh" onclick="copyCommand('${escapeAttr(item.cmd)}', this)">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                </svg>
+              </button>
+            </div>
+            <div class="cmd-tip">
+              <strong>Mẹo:</strong> ${item.tip}
+            </div>
+          </div>
+        </article>
+      `).join('');
+    }
+
+    // Helper functions
+    function escapeHtml(str) {
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    function escapeAttr(str) {
+      return str.replace(/"/g, "&quot;").replace(/'/g, "\\'");
+    }
+
+    // Copy Action
+    window.copyCommand = function(text, btnElement) {
+      navigator.clipboard.writeText(text).then(() => {
+        showToast();
+        btnElement.classList.add('copied');
+        btnElement.innerHTML = `
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+          </svg>
+        `;
+        setTimeout(() => {
+          btnElement.classList.remove('copied');
+          btnElement.innerHTML = `
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+            </svg>
+          `;
+        }, 2000);
+      }).catch(err => {
+        console.error('Không thể sao chép:', err);
+      });
+    };
+
+    function showToast() {
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2500);
+    }
+
+    // Event Listeners
+    searchInput.addEventListener('input', (e) => {
+      searchQuery = e.target.value.trim();
+      renderCommands();
+    });
+
+    // Keyboard shortcut / for search
+    window.addEventListener('keydown', (e) => {
+      if (e.key === '/' && document.activeElement !== searchInput) {
+        e.preventDefault();
+        searchInput.focus();
+      }
+    });
+
+    filterPills.forEach(pill => {
+      pill.addEventListener('click', () => {
+        filterPills.forEach(p => p.classList.remove('active'));
+        pill.classList.add('active');
+        currentCategory = pill.dataset.category;
+        renderCommands();
+      });
+    });
+
+    // Initial render
+    renderCommands();
+  </script>
+</body>
+</html>
